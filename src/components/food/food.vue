@@ -1,22 +1,183 @@
 <template>
-	<div v-show="" class="">
- 1、扎实的JavaScript的基础；
- 2、熟练掌握Html+css布局及效果实现，可处理常见浏览器兼容问题，能开发兼容手机浏览器的网页页面；
- 3、掌握Angular/React/Vue 一种或多种框架；
- 4、熟练使用常用打包框架，webpack gulp 等；
- 5、与后端开发人员配合，高质量完成网站前端开发工作；
- 6、能够根据需求，负责公司pc，移动端站点的功能开发、调试、上线及更新升级；
- 7、有实际项目开发经验，面试时请带作品。
- 任职要求：
- 1、熟悉H5，CSS3，JavaScript；
- 2、熟悉vuejsJS/ jQuery/ AngularJS；
- 3、熟悉git。
- 4、大专及以上学历；三年以上工作经验；
+	<div v-show="showFlag" class="food" transition="move" v-el:food>
+ 		<div class="food-content">
+ 			<div class="image-header">
+ 				<img :src="food.image"/>
+ 				<div class="back" @click="hide">
+ 					<i class="icon-arrow_lift"></i>
+ 				</div>
+ 			</div>
+ 			<div class="content">
+ 				<h1 class="title">{{food.name}}</h1>
+ 				<div class="detail">
+ 					<span class="sell-count">月售{{food.sellCount}}份</span>
+ 					<span class="rating">好评率{{food.rating}}%</span>
+ 				</div>
+ 				<div class="price">
+ 					<span class="now">¥<b>{{food.price}}</b></span><span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
+ 				</div>
+ 				<div class="cartcontent-wrapper">
+	 				<cartcontrol :food="food"></cartcontrol>
+	 			</div>
+	 			<div class="buy" @click="addFirst" transition="fade" v-show="!food.count || food.count===0">加入购物车</div>
+ 			</div>
+ 			<split v-show="food.info"></split>
+ 			<div class="info" v-show="food.info">
+ 				<h2 class="title">商品信息</h2>
+ 				<p class="text">{{food.info}}</p>
+ 			</div>
+ 			<split></split>
+ 		</div>
 	</div>
 </template>
-
-<script>
+<script type="text/ecmascript-6">
+	import Vue from 'vue';
+	import cartcontrol from 'components/cartcontrol/cartcontrol';
+	import BScroll from 'better-scroll';
+	import split from 'components/split/split';
+	export default {
+		props: {
+			food: {
+				type: Object
+			}
+		},
+		data() {
+			return {
+				showFlag: false
+			};
+		},
+		methods: {
+			show() {
+				this.showFlag = true;
+				this.$nextTick(() => {
+					if (!this.scroll) {
+						this.scroll = new BScroll(this.$els.food, {
+							click: true
+						});
+					} else {
+						this.scroll.refresh();
+					}
+				});
+			},
+			hide() {
+				this.showFlag = false;
+			},
+			addFirst(event) {
+				console.log('click');
+				if (!event._constructed) {
+					return;
+				}
+				this.$dispatch('cart.add', event.target);
+				Vue.set(this.food, 'count', 1);
+			}
+		},
+		components: {
+			cartcontrol,
+			split
+		}
+	};
 </script>
 
-<style>
+<style lang="stylus">
+	.food
+		position: fixed
+		left: 0
+		top: 0
+		bottom: 48px
+		z-index: 30
+		width: 100%
+		background: #fff
+		&.move-transition
+			transition: all .4s linear
+			transform: translate3d(0, 0, 0)
+		&.move-enter,&.move-leave
+			transform: translate3d(100%, 0, 0)
+		.image-header
+			position:relative
+			width: 100%
+			height: 0
+			padding-top: 100%
+			img
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+			.back
+				position: absolute
+				top: 10px
+				left: 0
+				.icon-arrow_lift
+					display: block
+					padding: 10px
+					font-size: 20px
+					color: #fff
+		.content
+			position: relative
+			padding: 18px
+			.title
+				line-height: 14px
+				margin-bottom: 8px
+				font-size: 14px
+				font-weight: 700
+				color: rgb(7, 17, 27)
+			.detail
+				margin-bottom: 18px
+				line-height: 10px
+				height: 10px
+				font-size: 0
+				.sell-count,.rating
+					font-size: 10px
+					color: rgb(147, 153, 159)
+				.sell-count
+					margin-right: 12px
+			.price
+				color: rgb(147,153,159)
+				line-height: 24px
+				.now
+					font-size: 10px
+					margin-right: 8px
+					color: rgb(240,20,20)
+					b
+						font-size: 14px
+						font-weight: 700
+				.old
+					font-size: 10px
+					font-weight: 700
+					color: rgb(147,153,159)
+					text-decoration: line-through
+			.cartcontent-wrapper
+				position: absolute
+				right: 12px
+				bottom: 12px
+			.buy
+				position: absolute
+				right: 18px
+				bottom: 18px
+				z-index: 10
+				height: 24px
+				line-height: 24px
+				padding: 0 12px
+				box-sizing: border-box
+				border-radius: 12px
+				font-size: 10px
+				color: #fff
+				background: rgb(0, 160, 220)
+				&.fade-transition
+					transition: all 0.2s
+					opacity: 1
+				&.fade-enter,&.fade-leave
+					opacity: 0
+		.info
+			padding: 18px
+			.title
+				line-height: 14px
+				margin-bottom: 6px
+				font-size: 14px
+				color: rgb(7, 17, 27)
+			.text
+				line-height: 24px
+				font-size: 12px
+				font-weight: 200
+				color: rgb(77, 85, 93) 
 </style>

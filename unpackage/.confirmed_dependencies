@@ -1,1 +1,11 @@
-null
+{
+  "index.html": {
+    "href": "index.html",
+    "resources": [
+      "static/css/reset.css",
+      "static/css/style.css"
+    ],
+    "refer": [],
+    "priority": 0
+  }
+}
