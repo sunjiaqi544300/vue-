@@ -6,30 +6,40 @@
 			<div class="tab-item"><a v-link="{path:'/ratings'}">评论</a></div>
 			<div class="tab-item"><a v-link="{path:'/seller'}">商家</a></div>
 		</div>
-		<router-view :seller="seller"></router-view>
+		<router-view :seller="seller" keep-alive></router-view>
 	</div>
 </template>
 <script type="text/ecmascript-6">
+	import {urlParse} from 'common/js/url_localStorage.js';
 	import header from './components/header/header.vue';
 	const ERR_OK = 0;
 	export default {
 		data() {
 			return {
-				seller: {}
+				seller: {
+					id: (() => {
+						let queryParam = urlParse();
+						console.log(queryParam);
+						return queryParam.id;
+					})()
+				}
 			};
 		},
 		created() {
-			this.$http.get('/api/seller').then((response) => {
+			this.$http.get('/api/seller?id=' + this.seller.id).then((response) => {
 //			response = response.json();
 				response = response.body;
 				console.log(response);
 				if (response.errno === ERR_OK) {
-					this.seller = response.data;
-//					console.log(this.seller);
+//					this.seller = response.data;
+					this.seller = Object.assign({}, this.seller, response.data);
+//					console.log(this.seller.id);
 				}
 			});
 		},
-		components: {'v-header': header}
+		components: {
+			'v-header': header
+		}
 	};
 </script>
 <style lang="stylus">
